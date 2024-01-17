@@ -1,0 +1,32 @@
+export const label_data = {
+    part: [
+        {name: "부품1", items: [], isActive: true},
+        {name: "부품2", items: [], isActive: true},
+        {name: "부품3", items: [], isActive: true},
+        {name: "부품4", items: [], isActive: true},
+        {name: "부품5", items: [], isActive: true},
+        {name: "부품6", items: [], isActive: true},
+        {name: "부품7", items: [], isActive: true},
+        {name: "부품8", items: [], isActive: true},
+        {name: "부품9", items: [], isActive: true},
+        {name: "부품10", items: [], isActive: true},
+        {name: "부품11", items: [], isActive: true},
+        {name: "부품12", items: [], isActive: true},
+        {name: "부품13", items: [], isActive: true},
+        {name: "부품14", items: [], isActive: true},
+        {name: "부품15", items: [], isActive: true},
+        {name: "부품16", items: [], isActive: true},
+        {name: "부품17", items: [], isActive: true},
+        {name: "부품18", items: [], isActive: true},
+        {name: "부품19", items: [], isActive: true},
+        {name: "부품20", items: [], isActive: true},
+        {name: "부품21", items: [], isActive: true},
+    ],
+    damage: [
+        {name: "손상1", items: [], isActive: true},
+        {name: "손상2", items: [], isActive: true},
+        {name: "손상3", items: [], isActive: true},
+        {name: "손상4", items: [], isActive: true},
+        {name: "손상5", items: [], isActive: true},
+    ]
+}

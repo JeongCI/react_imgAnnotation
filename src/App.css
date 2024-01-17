@@ -1,5 +1,12 @@
 @import url(./assets/fonts/font.css);
 
+.underBox{
+  background-color: #fff;
+  pointer-events: none;
+
+  z-index: 1000;
+  cursor: none;
+}
 *{
 box-sizing: border-box;
 }

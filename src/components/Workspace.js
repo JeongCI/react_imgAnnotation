@@ -1,37 +1,80 @@
 // Workspace.js
-import React, { useState, useRef } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Toolbar from './Toolbar';
 import Topinfo from './Topinfo';
 import Workcanvas from './Workcanvas';
 import Label from './Label';
 
+import {label_data} from "../label_data";
+
+
 function Workspace() {
-  const [selectedTool, setSelectedTool] = useState(null);
-  const workcanvasRef = useRef(null);
-  
-  const onSelectTool = (tool) => {
-    console.log("Selected tool:", tool);
-    setSelectedTool(tool);
+    const [selectedTool, setSelectedTool] = useState(null);
+    const workCanvasRef = useRef(null);
 
-    if (tool === "polygon" && workcanvasRef.current) {
-      workcanvasRef.current.startDraw();
-    } else if (tool === "bbox" && workcanvasRef.current) {
-      workcanvasRef.current.startDraw();
-    } else if (tool === "plus" && workcanvasRef.current) {
-      workcanvasRef.current.test();
-    } else if (tool === "minus" && workcanvasRef.current) {
-      workcanvasRef.current.test();
+    const [labelData, setLabelData] = useState(label_data);
+    const [selectedLabel, setSelectedLabel] = useState(null);
+
+    const selectLabelHandler = (flag, name) => {
+        setSelectedLabel(prevState => labelData[flag].find(item => item.name === name))
     }
-  };
 
-  return (
-    <div className="Workspace">
-      <Topinfo />
-      <Toolbar onSelectTool={onSelectTool}/>
-      <Workcanvas ref={workcanvasRef} selectedTool={selectedTool}/>
-      <Label />
-    </div>
-  );
+    useEffect(() => {
+        console.log("selectedLabel : ", selectedLabel)
+    }, [selectedLabel]);
+
+    const toggleLabelHandler = (flag, targetItem) => {
+        setLabelData((prevData) => {
+            const updatedFlag = [...prevData[flag]];
+            const targetIndex = updatedFlag.findIndex(item => item === targetItem)
+            updatedFlag[targetIndex] = {...updatedFlag[targetIndex], isActive: !updatedFlag[targetIndex].isActive};
+
+            return {
+                ...prevData,
+                [flag]: updatedFlag,
+            };
+        });
+    }
+
+    const toggleAllItemHandler = (flag, value) => {
+        setLabelData(prevData => {
+            const updatedFlag = prevData[flag].map((item) => ({...item, isActive: value}));
+
+            return {
+                ...prevData,
+                [flag]: updatedFlag,
+            };
+        })
+    }
+
+    const onSelectTool = (tool) => {
+        console.log("Selected tool:", tool);
+        setSelectedTool(tool);
+
+        if (tool === "polygon" && workCanvasRef.current) {
+            workCanvasRef.current.startDraw();
+        } else if (tool === "bbox" && workCanvasRef.current) {
+            workCanvasRef.current.startDraw();
+        } else if (tool === "plus" && workCanvasRef.current) {
+            workCanvasRef.current.test();
+        } else if (tool === "minus" && workCanvasRef.current) {
+            workCanvasRef.current.test();
+        }
+    };
+
+    return (
+        <div className="Workspace">
+            <Topinfo/>
+            <Toolbar onSelectTool={onSelectTool}/>
+            <Workcanvas ref={workCanvasRef}
+                        selectedTool={selectedTool}
+                        selectedLable={selectedLabel}/>
+            <Label labelData={labelData}
+                   onSelectLabel={selectLabelHandler}
+                   onToggleAllItem={toggleAllItemHandler}
+                   onToggleActive={toggleLabelHandler}/>
+        </div>
+    );
 }
 
 export default Workspace;

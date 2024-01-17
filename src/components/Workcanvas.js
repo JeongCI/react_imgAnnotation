@@ -33,23 +33,85 @@ const Showcase = ({ selectedTool }) => {
       prevBboxData.map((bbox) => (bbox.id === id ? { ...bbox, selectedLabel: newLabel } : bbox))
     );
   }
+
+  // 키보드 이벤트 처리
+  const handleKeyDown = (e) => {
+    console.log("e.key : " + e.key);
+    console.log("selectedTool : " + selectedTool);
+    if (selectedTool === 'polygon' && e.key === 'Enter') {
+      console.log("test");
+      // 엔터 키를 누르면 폴리곤 작업 완료
+      handlePolygonCreation();
+      finishAnnotation();
+    }
+  };
+
+  const handlePolygonCreation = () => {
+    // 폴리곤 생성 로직
+    setIsMouseDown(false);
+  
+    // 현재 폴리곤의 ID 확인
+    const position = polygons.findIndex((object) => object.id === selectedObject);
+  
+    if (position !== -1) {
+      // 이미 그려진 다각형을 수정하는 경우
+      const items = [...polygons];
+      const item = { ...items[position] };
+  
+      // 기존 다각형이 적어도 3개의 점을 가지고 있어야 함 (폴리곤 조건)
+      if (item.data.length >= 3) {
+        // 폴리곤이 완성된 경우 새로운 ID 생성
+        const newObjectId = uuidv4();
+  
+        // 현재 다각형에 새로운 ID 할당
+        item.id = newObjectId;
+  
+        items[position] = item;
+        setPolygons(items);
+        setHistory((prevHistory) => [...prevHistory, items]);
+        setSelectedObject(newObjectId); // 새로운 다각형을 선택 상태로 변경
+      } else {
+        // 폴리곤이 3개 미만의 점을 가지고 있는 경우 폴리곤 삭제
+        items.splice(position, 1);
+        setPolygons(items);
+        setHistory((prevHistory) => [...prevHistory, items]);
+      }
+    } else {
+      // 새로운 다각형을 그리는 경우
+      const object = {
+        id: selectedObject,
+        data: [], // 초기에는 빈 배열로 시작
+        selectedLabel: selectedLabel,
+      };
+      setPolygons((prevPolygons) => [...prevPolygons, object]);
+      setHistory((prevHistory) => [...prevHistory, polygons]);
+      setSelectedObject(object.id); // 생성된 다각형을 선택 상태로 변경    
+    }
+    // 이벤트 리스너 등록
+    document.addEventListener('keydown', handleKeyDown);
+
+    document.removeEventListener('keydown', handleKeyDown);
+      
+  };  
+
+
   
   function startDraw(e) {
     // selectedTool이 'polygon'인 경우에만 실행
     if (selectedTool === 'polygon' && e.button !== 1) {
       setIsMouseDown(true);
-  
       // 마우스 클릭 위치 계산
-      const { x, y } = backgroundRef.current.getBoundingClientRect();
+      const { x, y } = svgRef.current.getBoundingClientRect();
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
-  
+    
       const position = polygons.findIndex((object) => object.id === selectedObject);
-  
+      console.log("selectedObject : " + selectedObject);
+    
       if (position !== -1) {
         // 이미 그려진 다각형을 수정하는 경우
         const items = [...polygons];
         const item = { ...items[position] };
-  
+    
         // 클릭한 위치가 기존 점 위에 있는지 확인
         const clickedPointIndex = item.data.findIndex((point) => {
           const distance = Math.sqrt(
@@ -57,12 +119,12 @@ const Showcase = ({ selectedTool }) => {
           );
           return distance < 5; // 일정 거리 이내의 점을 클릭으로 간주 (임계값 조절 가능)
         });
-  
-        if (clickedPointIndex === -1){
+    
+        if (clickedPointIndex === -1) {
           // 클릭한 위치가 기존 점 위에 없으면 새로운 점 추가
           item.data.push({ x: clickPositionX, y: clickPositionY });
         }
-  
+    
         items[position] = item;
         setPolygons(items);
         setHistory((prevHistory) => [...prevHistory, items]);
@@ -86,7 +148,7 @@ const Showcase = ({ selectedTool }) => {
       setIsMouseDown(true);
   
       // 마우스 클릭 위치 계산
-      const { x, y } = backgroundRef.current.getBoundingClientRect();
+      const { x, y } = svgRef.current.getBoundingClientRect();
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
   
       // 바운딩 박스의 시작 좌표를 설정
@@ -104,7 +166,7 @@ const Showcase = ({ selectedTool }) => {
       setIsMouseDown(true);
   
       // 마우스 클릭 위치 계산
-      const { x, y } = backgroundRef.current.getBoundingClientRect();
+      const { x, y } = svgRef.current.getBoundingClientRect();
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
   
       const position = polygons.findIndex((object) => object.id === selectedObject);
@@ -133,12 +195,12 @@ const Showcase = ({ selectedTool }) => {
       } else {
         setHistory((prevHistory) => [...prevHistory, polygons]);
       }
-    }  
-  }
+    }
+  } 
   
   function handleMouseMove(e) {
     if (isMouseDown && selectedTool === 'bbox') {
-      const { x, y } = backgroundRef.current.getBoundingClientRect();
+      const { x, y } = svgRef.current.getBoundingClientRect();
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
       
       setBboxData((prevBboxData) => {
@@ -166,7 +228,7 @@ const Showcase = ({ selectedTool }) => {
     } else if (isMouseDown && selectedTool === 'polygon') {
       if (selectedPoint !== null) {
         // If a point is selected, update its position
-        const { x, y } = backgroundRef.current.getBoundingClientRect();
+        const { x, y } = svgRef.current.getBoundingClientRect();
         const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
     
         const items = [...polygons];
@@ -178,7 +240,7 @@ const Showcase = ({ selectedTool }) => {
     } else if (isMouseDown && selectedTool === 'handle') { // polygon 점 이동
       if (selectedPoint !== null) {
         // If a point is selected, update its position
-        const { x, y } = backgroundRef.current.getBoundingClientRect();
+        const { x, y } = svgRef.current.getBoundingClientRect();
         const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
     
         const items = [...polygons];
@@ -448,33 +510,32 @@ const Showcase = ({ selectedTool }) => {
   };
   const totalSlides = swiper?.slides?.length || 0;
 
-  // 휠 확대 축소
   const handleWheel = (e) => {
     if (selectedTool === "plus" || selectedTool === "minus") {
       e.preventDefault(); // 스크롤 이벤트 기본 동작 방지
-
+  
       const scaleFactor = 1.1; // 확대/축소 비율
       const delta = e.deltaY || e.detail || e.wheelDelta;
-
-      // 현재 이미지 및 SVG 크기 및 새로운 크기 계산
+  
+      // 현재 이미지 크기 및 새로운 크기 계산
       const currentScale = scale;
       let newScale = delta > 0 ? currentScale / scaleFactor : currentScale * scaleFactor;
-
+  
       // 최소 및 최대 크기 제한
       const minScale = 0.7;
       const maxScale = 2.5;
       newScale = Math.max(minScale, Math.min(newScale, maxScale));
-
+  
       // 이미지 크기 업데이트
       setScale(newScale);
-
+  
       // 현재 이미지 크기 가져오기
       const currentWidth = image.current.width;
       const currentHeight = image.current.height;
-
+  
       // 확대/축소 비율에 기반하여 새로운 크기 계산
       let newWidth, newHeight;
-
+  
       if (delta > 0) {
         // 축소
         newWidth = currentWidth / scaleFactor;
@@ -484,22 +545,16 @@ const Showcase = ({ selectedTool }) => {
         newWidth = currentWidth * scaleFactor;
         newHeight = currentHeight * scaleFactor;
       }
-
+  
       if (newScale > minScale && newScale < maxScale) {
         // 최소 및 최대 확대/축소 배수 설정
         newWidth = Math.max(Math.min(newWidth, currentWidth * maxScale), currentWidth * minScale);
         newHeight = Math.max(Math.min(newHeight, currentHeight * maxScale), currentHeight * minScale);
-
+  
         // 이미지 크기 및 위치 업데이트
         image.current.style.width = `${newWidth}px`;
         image.current.style.height = `${newHeight}px`;
-
-        // Check if svgRef is initialized before updating styles
-        if (svgRef.current) {
-          svgRef.current.style.width = `${newWidth}px`;
-          svgRef.current.style.height = `${newHeight}px`;
-        }
-
+  
         // polygon 좌표 업데이트
         setPolygons((prevPolygons) => {
           return prevPolygons.map((item) => {
@@ -514,7 +569,7 @@ const Showcase = ({ selectedTool }) => {
             };
           });
         });
-
+  
         // bbox 좌표 업데이트
         setBboxData((prevBboxData) => {
           return prevBboxData.map((bbox) => {
@@ -527,51 +582,72 @@ const Showcase = ({ selectedTool }) => {
             };
           });
         });
+  
+        // SVG 크기 업데이트 (이미지 크기와 동일하게 설정)
+        svgRef.current.style.width = `${newWidth}px`;
+        svgRef.current.style.height = `${newHeight}px`;
       }
     }
   };
-
-  useEffect(() => {
-    // 휠 이벤트 리스너 등록
-    window.addEventListener("wheel", handleWheel);
-  
-    // 컴포넌트 언마운트 시 리스너 해제
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, [handleWheel]);  
 
   return (
     <div>
       <Swiper {...swiperParams}>
         <SwiperSlide>
-          <div className="box" ref={backgroundRef} onMouseDown={startDraw} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onWheel={handleWheel}>
+          <div className="box" ref={backgroundRef} onWheel={handleWheel}>
             <img src={process.env.PUBLIC_URL + '/caraccident01.jpg'} ref={image} alt="car accident"/>
-            <svg className="svg">
-              {image.current && (
-                <rect
-                  x="0"
-                  y="0"
-                  width={image.current.naturalWidth}
-                  height={image.current.naturalHeight}
-                  fill="transparent"
-                  style={{ cursor: 'crosshair' }}
-                />
-              )}
-              <g>
-                {polygons.map((item) => (
-                  <g key={item.id}>
-                    {item.data.map((coordinate, index) => (
-                      <circle key={index} cx={coordinate.x} cy={coordinate.y} r="5" fill="blue" />
-                    ))}
-                    <polygon points={getPositionString(item)} className="polygon" 
-                    onMouseDown={(e) => handlePolygonMouseDown(item.id, e)}/>
-                  </g>
-                ))}
-              </g>
-              <g>
+            <svg ref={svgRef} className="svg" tabIndex="0" onMouseDown={startDraw} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}  onKeyDown={handleKeyDown}>
+            <g>
+              {polygons.map((item) => (
+                <g key={item.id}>
+                  <foreignObject x={item.data[0].x} y={item.data[0].y - 30} width="200" height="200" style={{  pointerEvents:"none", position:"absolute", zIndex:"999"}} >
+                    <div className="underBox" key={item.id}>
+                      <span>POLYGON</span>
+                      <select
+                      value={item.selectedLabel}
+                      onChange={(e) => handleLabelChange(item.id, e.target.value)}
+                    >
+                      {Labelpice.map((label, index) => (
+                        <option key={index} value={label}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                    </div>
+                  </foreignObject>
+                  {item.data.map((coordinate, index) => (
+                    <circle key={index} cx={coordinate.x} cy={coordinate.y} r="5" fill="blue" />
+                  ))}
+                  <polygon
+                    points={getPositionString(item)}
+                    className="polygon"
+                    onMouseDown={(e) => handlePolygonMouseDown(item.id, e)}
+                    fill="rgba(0, 0, 255, 0.2)" // Add fill color
+                    stroke="blue" // Add stroke color
+                    strokeWidth="2" // Add stroke width
+                  />
+                  {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
+                </g>
+              ))}
+            </g>
+            <g>
               {bboxData.map((bbox) => (
                 <g key={bbox.id}>
+                  <foreignObject x={bbox.x - 30} y={bbox.y - 30} width="200" height="30" style={{  pointerEvents:"none", position:"absolute", zIndex:"999"}} >
+                    <div key={bbox.id} className="underBox">
+                      <span>BBOX</span>
+                      <select
+                        value={bbox.selectedLabel}
+                        onChange={(e) => handleLabelChange(bbox.id, e.target.value)}
+                      >
+                        {Labelpice.map((label, index) => (
+                          <option key={index} value={label}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </foreignObject>
                   {/* 좌상단 꼭지점 */}
                   <circle cx={bbox.x} cy={bbox.y} r="5" fill="red" />
                   {/* 우상단 꼭지점 */}
@@ -580,7 +656,7 @@ const Showcase = ({ selectedTool }) => {
                   <circle cx={bbox.x} cy={bbox.y + bbox.height} r="5" fill="red" />
                   {/* 우하단 꼭지점 */}
                   <circle cx={bbox.x + bbox.width} cy={bbox.y + bbox.height} r="5" fill="red" />
-
+  
                   {/* 바운딩 박스 */}
                   <rect
                     x={bbox.x}
@@ -592,8 +668,9 @@ const Showcase = ({ selectedTool }) => {
                     strokeWidth="2"
                     onMouseDown={(e) => handleBboxMouseDown(bbox.id, e)}
                   />
+                  {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
                 </g>
-              ))}
+                ))}
             </g>
             </svg>
           </div>
@@ -635,8 +712,8 @@ const Showcase = ({ selectedTool }) => {
                 <div className="data">
                 {bbox.points && bbox.points.length > 0 && (
                   <span>
-                    {/* 마지막 꼭지점의 좌표만 출력 */}
-                    X: {bbox.points[bbox.points.length - 1].x}, Y: {bbox.points[bbox.points.length - 1].y}
+                    {/* 첫번째 꼭지점의 좌표만 출력 */}
+                    X: {bbox.points[0].x}, Y: {bbox.points[0].y}
                     width: {bbox.width}, height: {bbox.height}
                   </span>
                 )}
@@ -686,6 +763,7 @@ flex-wrap: wrap;
 }
 
 .box {
+position: relative;
 width: 100%;
 height: 750px;
 margin-bottom: 16px;
@@ -695,11 +773,11 @@ background-color:#e9e9e9;
 
 .svg {
 position: absolute;
-width: calc(100% - 20px);
-height: 730px;
-max-height: 750px;
+width: 100%;
+height: 100%;
 top: 0;
 left: 0;
+z-index:1;
 }
 
 .polygon {
