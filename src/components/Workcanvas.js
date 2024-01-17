@@ -597,57 +597,53 @@ const Showcase = ({ selectedTool }) => {
           <div className="box" ref={backgroundRef} onWheel={handleWheel}>
             <img src={process.env.PUBLIC_URL + '/caraccident01.jpg'} ref={image} alt="car accident"/>
             <svg ref={svgRef} className="svg" tabIndex="0" onMouseDown={startDraw} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}  onKeyDown={handleKeyDown}>
-            <g>
-              {polygons.map((item) => (
-                <g key={item.id}>
-                  <foreignObject x={item.data[0].x} y={item.data[0].y - 30} width="200" height="200" style={{  pointerEvents:"none", position:"absolute", zIndex:"999"}} >
-                    <div className="underBox" key={item.id}>
-                      <span>POLYGON</span>
-                      <select
-                      value={item.selectedLabel}
-                      onChange={(e) => handleLabelChange(item.id, e.target.value)}
-                    >
-                      {Labelpice.map((label, index) => (
-                        <option key={index} value={label}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    </div>
-                  </foreignObject>
-                  {item.data.map((coordinate, index) => (
-                    <circle key={index} cx={coordinate.x} cy={coordinate.y} r="5" fill="blue" />
-                  ))}
-                  <polygon
-                    points={getPositionString(item)}
-                    className="polygon"
-                    onMouseDown={(e) => handlePolygonMouseDown(item.id, e)}
-                    fill="rgba(0, 0, 255, 0.2)" // Add fill color
-                    stroke="blue" // Add stroke color
-                    strokeWidth="2" // Add stroke width
-                  />
-                  {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
-                </g>
-              ))}
-            </g>
-            <g>
+              {image.current && (
+                <rect
+                  x="0"
+                  y="0"
+                  width={image.current.naturalWidth}
+                  height={image.current.naturalHeight}
+                  fill="transparent"
+                  style={{ cursor: 'crosshair' }}
+                />
+              )}
+              <g>
+                {polygons.map((item) => (
+                  <g key={item.id}>
+                    {item.data.map((coordinate, index) => (
+                      <circle key={index} cx={coordinate.x} cy={coordinate.y} r="5" fill="blue" />
+                    ))}
+                    <polygon
+                      points={getPositionString(item)}
+                      className="polygon"
+                      onMouseDown={(e) => handlePolygonMouseDown(item.id, e)}
+                      fill="rgba(0, 0, 255, 0.2)" // Add fill color
+                      stroke="blue" // Add stroke color
+                      strokeWidth="2" // Add stroke width
+                    />
+                    {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
+                    <foreignObject x={item.data[0].x} y={item.data[0].y - 30} width="100" height="40">
+                      <div className="underBox" key={item.id}>
+                        <span>POLYGON</span>
+                        <div className="underData">
+                        <select
+                        value={item.selectedLabel}
+                        onChange={(e) => handleLabelChange(item.id, e.target.value)} >
+                          {Labelpice.map((label, index) => (
+                            <option key={index} value={label}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                        </div>
+                      </div>
+                    </foreignObject>
+                  </g>
+                ))}
+              </g>
+              <g>
               {bboxData.map((bbox) => (
                 <g key={bbox.id}>
-                  <foreignObject x={bbox.x - 30} y={bbox.y - 30} width="200" height="30" style={{  pointerEvents:"none", position:"absolute", zIndex:"999"}} >
-                    <div key={bbox.id} className="underBox">
-                      <span>BBOX</span>
-                      <select
-                        value={bbox.selectedLabel}
-                        onChange={(e) => handleLabelChange(bbox.id, e.target.value)}
-                      >
-                        {Labelpice.map((label, index) => (
-                          <option key={index} value={label}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </foreignObject>
                   {/* 좌상단 꼭지점 */}
                   <circle cx={bbox.x} cy={bbox.y} r="5" fill="red" />
                   {/* 우상단 꼭지점 */}
@@ -656,7 +652,7 @@ const Showcase = ({ selectedTool }) => {
                   <circle cx={bbox.x} cy={bbox.y + bbox.height} r="5" fill="red" />
                   {/* 우하단 꼭지점 */}
                   <circle cx={bbox.x + bbox.width} cy={bbox.y + bbox.height} r="5" fill="red" />
-  
+
                   {/* 바운딩 박스 */}
                   <rect
                     x={bbox.x}
@@ -669,8 +665,24 @@ const Showcase = ({ selectedTool }) => {
                     onMouseDown={(e) => handleBboxMouseDown(bbox.id, e)}
                   />
                   {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
+                  <foreignObject x={bbox.x + (bbox.width/2.5)} y={bbox.y + (bbox.height/2.5)} width="100" height="40">
+                    <div className="underBox" key={bbox.id}>
+                      <span>BBOX</span>
+                      <div className="underData">
+                      <select
+                        value={bbox.selectedLabel}
+                        onChange={(e) => handleLabelChange(bbox.id, e.target.value)} >
+                        {Labelpice.map((label, index) => (
+                          <option key={index} value={label}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                      </div>
+                    </div>
+                  </foreignObject>
                 </g>
-                ))}
+              ))}
             </g>
             </svg>
           </div>
@@ -777,7 +789,6 @@ width: 100%;
 height: 100%;
 top: 0;
 left: 0;
-z-index:1;
 }
 
 .polygon {
