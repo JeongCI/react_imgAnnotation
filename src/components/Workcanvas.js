@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 const Labelpice = ["부품1", "부품2", "부품3", "부품4", "부품5", "부품6", "부품7", "부품8", "부품9", "부품10", "부품11", "부품12", "부품13", "부품14", "부품15", "부품16", "부품17", "부품18", "부품19", "부품20", "부품21"];
 
 
-const Showcase = ({ selectedTool }) => {
+const Showcase = ({ selectedTool, onAnnotationChange }) => {
   const [polygons, setPolygons] = useState([]);
   const [selectedObject, setSelectedObject] = useState(null);
   const backgroundRef = useRef();
@@ -27,6 +27,7 @@ const Showcase = ({ selectedTool }) => {
       prevPolygons.map((polygon) =>
         polygon.id === id ? { ...polygon, selectedLabel: newLabel } : polygon
       )
+      
     );
   
     setBboxData((prevBboxData) =>
@@ -36,13 +37,15 @@ const Showcase = ({ selectedTool }) => {
 
   // 키보드 이벤트 처리
   const handleKeyDown = (e) => {
-    console.log("e.key : " + e.key);
-    console.log("selectedTool : " + selectedTool);
     if (selectedTool === 'polygon' && e.key === 'Enter') {
-      console.log("test");
       // 엔터 키를 누르면 폴리곤 작업 완료
-      handlePolygonCreation();
-      finishAnnotation();
+      const position = polygons.findIndex((object) => object.id === selectedObject);
+      if(position === -1) {
+        return;
+      } else {
+        handlePolygonCreation();
+        finishAnnotation();
+      }
     }
   };
 
@@ -85,13 +88,12 @@ const Showcase = ({ selectedTool }) => {
       };
       setPolygons((prevPolygons) => [...prevPolygons, object]);
       setHistory((prevHistory) => [...prevHistory, polygons]);
-      setSelectedObject(object.id); // 생성된 다각형을 선택 상태로 변경    
+      setSelectedObject(object.id); // 생성된 다각형을 선택 상태로 변경  
     }
     // 이벤트 리스너 등록
     document.addEventListener('keydown', handleKeyDown);
 
     document.removeEventListener('keydown', handleKeyDown);
-      
   };  
 
 
@@ -105,7 +107,6 @@ const Showcase = ({ selectedTool }) => {
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
     
       const position = polygons.findIndex((object) => object.id === selectedObject);
-      console.log("selectedObject : " + selectedObject);
     
       if (position !== -1) {
         // 이미 그려진 다각형을 수정하는 경우
@@ -162,38 +163,50 @@ const Showcase = ({ selectedTool }) => {
           height: 0,
         },
       ]);
-    } else if(selectedTool === 'handle' && e.button !== 1){ // 폴리곤 이동.
+    } else if(selectedTool === 'handle' && e.button !== 1){ // 폴리곤 점 클릭
       setIsMouseDown(true);
   
       // 마우스 클릭 위치 계산
       const { x, y } = svgRef.current.getBoundingClientRect();
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
-  
-      const position = polygons.findIndex((object) => object.id === selectedObject);
-  
-      if (position !== -1) {
-        // 이미 그려진 다각형을 수정하는 경우
-        const items = [...polygons];
-        const item = { ...items[position] };
-  
-        // 클릭한 위치가 기존 점 위에 있는지 확인
-        const clickedPointIndex = item.data.findIndex((point) => {
+
+      // 클릭한 위치의 폴리곤 ID 찾기
+      let clickedPolygonId = null;
+      let clickedPointIndex = -1; // 블록 외부에서 정의
+      for (const polygon of polygons) {
+        clickedPointIndex = polygon.data.findIndex((point) => {
           const distance = Math.sqrt(
             Math.pow(point.x - clickPositionX, 2) + Math.pow(point.y - clickPositionY, 2)
           );
           return distance < 5; // 일정 거리 이내의 점을 클릭으로 간주 (임계값 조절 가능)
         });
-  
+    
         if (clickedPointIndex !== -1) {
+          clickedPolygonId = polygon.id;
+          break; // 클릭한 폴리곤을 찾았으면 루프 종료
+        }
+      }
+    
+      // 클릭한 폴리곤 ID를 통해 상태 업데이트 등 수행
+      if (clickedPolygonId !== null) {
+        const position = polygons.findIndex((object) => object.id === clickedPolygonId);
+    
+        if (position !== -1) {
+          // 이미 그려진 다각형을 수정하는 경우
+          const items = [...polygons];
+          const item = { ...items[position] };
+    
           // 클릭한 위치가 기존 점 위에 있으면 해당 점을 선택한 것으로 처리
           setSelectedPoint({ polygonIndex: position, pointIndex: clickedPointIndex });
+    
+          items[position] = item;
+          setPolygons(items);
+          setHistory((prevHistory) => [...prevHistory, items]);
+        } else {
+          setHistory((prevHistory) => [...prevHistory, polygons]);
         }
-  
-        items[position] = item;
-        setPolygons(items);
-        setHistory((prevHistory) => [...prevHistory, items]);
       } else {
-        setHistory((prevHistory) => [...prevHistory, polygons]);
+        return;
       }
     }
   } 
@@ -213,11 +226,21 @@ const Showcase = ({ selectedTool }) => {
         }
       
         // 새로운 꼭지점의 좌표 추가
-        currentBbox.points.push({ x: clickPositionX, y: clickPositionY });
+        const newPoint = { x: clickPositionX, y: clickPositionY };
+      
+        // points 배열에 꼭지점이 없거나 하나만 있는 경우 초기값 설정
+        if (currentBbox.points.length === 0) {
+          currentBbox.points = [newPoint, newPoint];
+        } else if (currentBbox.points.length === 1) {
+          currentBbox.points.push(newPoint);
+        } else {
+          // 첫 번째와 마지막 꼭지점만 포함되도록 업데이트
+          currentBbox.points[1] = newPoint;
+        }
       
         // 바운딩 박스의 너비와 높이를 계산
-        const width = clickPositionX - currentBbox.points[0].x;
-        const height = clickPositionY - currentBbox.points[0].y;
+        const width = newPoint.x - currentBbox.points[0].x;
+        const height = newPoint.y - currentBbox.points[0].y;
       
         // 바운딩 박스의 너비와 높이를 업데이트
         currentBbox.width = width;
@@ -254,7 +277,8 @@ const Showcase = ({ selectedTool }) => {
 
   function handleMouseUp() {
     setIsMouseDown(false);
-    setSelectedPoint(null);   
+    setSelectedPoint(null);
+    updateAnnotations(bboxData, polygons);
   }  
 
   function getCoordinates(e, offsetX = 0, offsetY = 0) {
@@ -274,7 +298,21 @@ const Showcase = ({ selectedTool }) => {
       const newBboxData = prevBboxData.filter((bbox) => bbox.id !== id);
       return newBboxData;
     });
+
+    updateAnnotations(bboxData, polygons);
   }
+
+  const updateAnnotations = () => {
+    // 현재 상태에서 필요한 주석 정보 추출
+    const currentPolygons = polygons;
+    const currentBboxData = bboxData;
+
+    // 상위 컴포넌트로 주석 정보 전달
+    onAnnotationChange({
+      polygons: currentPolygons,
+      bboxData: currentBboxData,
+    });
+  };
 
   function newAnnotation() {
     setIsDrawing(true);
@@ -622,9 +660,10 @@ const Showcase = ({ selectedTool }) => {
                       strokeWidth="2" // Add stroke width
                     />
                     {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
-                    <foreignObject x={item.data[0].x} y={item.data[0].y - 30} width="100" height="40">
+                    <foreignObject x={item.data[0].x} y={item.data[0].y - 100} width="100" height="80">
                       <div className="underBox" key={item.id}>
                         <span>POLYGON</span>
+                        <button onClick={() => deleteAnnotation(item.id)}>Delete</button>
                         <div className="underData">
                         <select
                         value={item.selectedLabel}
@@ -665,9 +704,10 @@ const Showcase = ({ selectedTool }) => {
                     onMouseDown={(e) => handleBboxMouseDown(bbox.id, e)}
                   />
                   {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
-                  <foreignObject x={bbox.x + (bbox.width/2.5)} y={bbox.y + (bbox.height/2.5)} width="100" height="40">
-                    <div className="underBox" key={bbox.id}>
+                  <foreignObject x={bbox.x} y={bbox.y - 80} width="100" height="80">
+                    <div className="underBox" key={bbox.id} >
                       <span>BBOX</span>
+                      <button onClick={() => deleteAnnotation(bbox.id)}>Delete</button>
                       <div className="underData">
                       <select
                         value={bbox.selectedLabel}
@@ -693,55 +733,7 @@ const Showcase = ({ selectedTool }) => {
           )}
           <button onClick={undoAnnotation}>Undo</button>
           <button onClick={redoAnnotation}>Redo</button>
-          <div className="panel">
-            {polygons.map((item) => (
-              <div className="object" key={item.id}>
-                <span>Object ID: {item.id}</span>
-                <button onClick={() => deleteAnnotation(item.id)}>Delete Object</button>
-                <div className="data">
-                  {item.data.map((item, index) => (
-                    <span key={index}>
-                      X: {item.x}, Y: {item.y}
-                    </span>
-                  ))}
-                </div>
-                <select
-                  value={item.selectedLabel}
-                  onChange={(e) => handleLabelChange(item.id, e.target.value)}
-                >
-                  {Labelpice.map((label, index) => (
-                    <option key={index} value={label}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
-            {bboxData.map((bbox) => (
-              <div className="object" key={bbox.id}>
-                <span>Object ID: {bbox.id}</span>
-                <button onClick={() => deleteAnnotation(bbox.id)}>Delete Object</button>
-                <div className="data">
-                {bbox.points && bbox.points.length > 0 && (
-                  <span>
-                    {/* 첫번째 꼭지점의 좌표만 출력 */}
-                    X: {bbox.points[0].x}, Y: {bbox.points[0].y}
-                    width: {bbox.width}, height: {bbox.height}
-                  </span>
-                )}
-                </div>
-                <select
-                  value={bbox.selectedLabel}
-                  onChange={(e) => handleLabelChange(bbox.id, e.target.value)}
-                >
-                  {Labelpice.map((label, index) => (
-                    <option key={index} value={label}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}           
+          <div className="panel">         
           </div>
         </SwiperSlide>
         <SwiperSlide>
@@ -831,12 +823,26 @@ background: white;
   );
 };
 
-function Workcanvas({ selectedTool }) {
+function Workcanvas({ selectedTool,  onAnnotationChange }) {
+  // Workcanvas에서 관리하고자 하는 주석 정보를 state로 정의
+  const [annotations, setAnnotations] = useState({ polygons: [], bboxData: [] });
+
+  // Showcase 컴포넌트에서 주석 정보가 업데이트될 때 실행되는 콜백 함수
+  const handleAnnotationChange = (newAnnotations) => {
+    setAnnotations(newAnnotations);
+    // 주석 정보가 업데이트되면 상위 컴포넌트로 전달
+    onAnnotationChange(newAnnotations);    
+  }; 
   return (
     <div className="Workcanvas">
       <h4>food_20230123.png</h4>
       <div className="canvas">
-        <Showcase selectedTool={selectedTool} />
+      <Showcase selectedTool={selectedTool} onAnnotationChange={handleAnnotationChange} />
+      </div>
+      {/* 주석 정보 확인용 */}
+      <div>
+        <h5>Annotation Data:</h5>
+        <pre>{JSON.stringify(annotations, null, 2)}</pre>
       </div>
     </div>
   );
