@@ -15,11 +15,13 @@ function Workspace() {
   const [labelData, setLabelData] = useState(label_data);
   const [selectedLabel, setSelectedLabel] = useState(null);
 
-  const [annotations, setAnnotations] = useState({ polygons: [], bboxData: [] });
+  const [annotations, setAnnotations] = useState({annotations: [], });
 
   const selectLabelHandler = (flag, name) => {
-      setSelectedLabel(prevState => labelData[flag].find(item => item.name === name))
-  }
+    // 부품을 선택할 때 이전 데이터를 삭제하고 새로운 데이터로 교체
+    updateItemInLabelData(flag, name, selectedLabel);
+    setSelectedLabel(prevState => labelData[flag].find(item => item.name === name));
+  };
 
   useEffect(() => {
       console.log("selectedLabel : ", selectedLabel)
@@ -52,7 +54,41 @@ function Workspace() {
   const handleAnnotationChange = (newAnnotations) => {
     // 주석 정보가 업데이트되면 Workspace 컴포넌트의 state를 업데이트
     setAnnotations(newAnnotations);
-  }; 
+    
+    newAnnotations.annotations.forEach((annotation) => {
+      const flag = 'part';
+      const labelName = annotation.selectedLabel;
+      
+      // 이전 데이터를 삭제하고 새로운 데이터로 교체
+      selectLabelHandler(flag, labelName);
+      toggleAllItemHandler(flag, true);
+      updateItemInLabelData(flag, labelName, annotation);
+    });
+  };
+  
+  // labelData 상태 업데이트를 위한 함수
+  const updateItemInLabelData = (flag, labelName, newItemData) => {
+    setLabelData((prevData) => {
+      const updatedFlag = [...prevData[flag]];
+      const targetItemIndex = updatedFlag.findIndex((item) => item.name === labelName);
+  
+      if (targetItemIndex !== -1) {
+        const updatedItems = [newItemData];
+  
+        updatedFlag[targetItemIndex] = {
+          ...updatedFlag[targetItemIndex],
+          items: updatedItems,
+        };
+  
+        return {
+          ...prevData,
+          [flag]: updatedFlag,
+        };
+      }
+  
+      return prevData;
+    });
+  };
 
   const onSelectTool = (tool) => {
       console.log("Selected tool:", tool);

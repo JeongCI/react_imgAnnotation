@@ -2,11 +2,11 @@ import React from 'react';
 
 export const BboxIcon = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2.00312" y="2.0001" width="12" height="12" stroke="#393847" stroke-width="0.8" stroke-linecap="square" stroke-dasharray="3.2 2.4" />
-        <circle cx="1.60156" cy="1.6" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="1.60156" cy="14.4" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="14.3984" cy="1.6" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="14.3984" cy="14.3998" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
+        <rect x="2.00312" y="2.0001" width="12" height="12" stroke="#393847" strokeWidth="0.8" strokeLinecap="square" strokeDasharray="3.2 2.4" />
+        <circle cx="1.60156" cy="1.6" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="1.60156" cy="14.4" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="14.3984" cy="1.6" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="14.3984" cy="14.3998" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
     </svg>
 );
 export const HandelIcon = () => (
@@ -16,13 +16,13 @@ export const HandelIcon = () => (
 );
 export const Ploygun = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2.00001 2.77351L7.7688 6.85974L8.00001 7.02352L8.23121 6.85974L14 2.77351V11.3528L8.00001 14.3528L2.00001 11.3528V2.77351Z" stroke="#393847" stroke-width="0.8" stroke-linecap="square" />
-        <circle cx="7.99999" cy="6.80001" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="7.99999" cy="14" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="1.6" cy="2.00002" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="1.6" cy="11.6" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="14.4" cy="2.00002" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
-        <circle cx="14.4" cy="11.6" r="1.2" fill="white" stroke="#393847" stroke-width="0.8" />
+        <path d="M2.00001 2.77351L7.7688 6.85974L8.00001 7.02352L8.23121 6.85974L14 2.77351V11.3528L8.00001 14.3528L2.00001 11.3528V2.77351Z" stroke="#393847" strokeWidth="0.8" strokeLinecap="square" />
+        <circle cx="7.99999" cy="6.80001" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="7.99999" cy="14" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="1.6" cy="2.00002" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="1.6" cy="11.6" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="14.4" cy="2.00002" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
+        <circle cx="14.4" cy="11.6" r="1.2" fill="white" stroke="#393847" strokeWidth="0.8" />
     </svg>
 );
 export const Clean = () => (
@@ -42,8 +42,8 @@ export const Undo = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="lucide:undo-2">
             <g id="Group">
-                <path id="Vector" d="M9.99999 9.33332L13.3333 5.99999L9.99999 2.66666" stroke="#393847" stroke-linecap="round" stroke-linejoin="round" />
-                <path id="Vector_2" d="M13.3333 6H6.33333C5.85181 6 5.37502 6.09484 4.93016 6.27911C4.48529 6.46338 4.08108 6.73346 3.7406 7.07394C3.40012 7.41442 3.13004 7.81863 2.94577 8.26349C2.7615 8.70835 2.66666 9.18515 2.66666 9.66667C2.66666 10.1482 2.7615 10.625 2.94577 11.0698C3.13004 11.5147 3.40012 11.9189 3.7406 12.2594C4.08108 12.5999 4.48529 12.87 4.93016 13.0542C5.37502 13.2385 5.85181 13.3333 6.33333 13.3333H8.66666" stroke="#393847" stroke-linecap="round" stroke-linejoin="round" />
+                <path id="Vector" d="M9.99999 9.33332L13.3333 5.99999L9.99999 2.66666" stroke="#393847" strokeLinecap="round" strokeLinejoin="round" />
+                <path id="Vector_2" d="M13.3333 6H6.33333C5.85181 6 5.37502 6.09484 4.93016 6.27911C4.48529 6.46338 4.08108 6.73346 3.7406 7.07394C3.40012 7.41442 3.13004 7.81863 2.94577 8.26349C2.7615 8.70835 2.66666 9.18515 2.66666 9.66667C2.66666 10.1482 2.7615 10.625 2.94577 11.0698C3.13004 11.5147 3.40012 11.9189 3.7406 12.2594C4.08108 12.5999 4.48529 12.87 4.93016 13.0542C5.37502 13.2385 5.85181 13.3333 6.33333 13.3333H8.66666" stroke="#393847" strokeLinecap="round" strokeLinejoin="round" />
             </g>
         </g>
     </svg>
@@ -53,8 +53,8 @@ export const Redo = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="lucide:undo-2">
             <g id="Group">
-                <path id="Vector" d="M6.00001 9.33332L2.66667 5.99999L6.00001 2.66666" stroke="#393847" stroke-linecap="round" stroke-linejoin="round" />
-                <path id="Vector_2" d="M2.66667 6H9.66667C10.1482 6 10.625 6.09484 11.0698 6.27911C11.5147 6.46338 11.9189 6.73346 12.2594 7.07394C12.5999 7.41442 12.87 7.81863 13.0542 8.26349C13.2385 8.70835 13.3333 9.18515 13.3333 9.66667C13.3333 10.1482 13.2385 10.625 13.0542 11.0698C12.87 11.5147 12.5999 11.9189 12.2594 12.2594C11.9189 12.5999 11.5147 12.87 11.0698 13.0542C10.625 13.2385 10.1482 13.3333 9.66667 13.3333H7.33334" stroke="#393847" stroke-linecap="round" stroke-linejoin="round" />
+                <path id="Vector" d="M6.00001 9.33332L2.66667 5.99999L6.00001 2.66666" stroke="#393847" strokeLinecap="round" strokeLinejoin="round" />
+                <path id="Vector_2" d="M2.66667 6H9.66667C10.1482 6 10.625 6.09484 11.0698 6.27911C11.5147 6.46338 11.9189 6.73346 12.2594 7.07394C12.5999 7.41442 12.87 7.81863 13.0542 8.26349C13.2385 8.70835 13.3333 9.18515 13.3333 9.66667C13.3333 10.1482 13.2385 10.625 13.0542 11.0698C12.87 11.5147 12.5999 11.9189 12.2594 12.2594C11.9189 12.5999 11.5147 12.87 11.0698 13.0542C10.625 13.2385 10.1482 13.3333 9.66667 13.3333H7.33334" stroke="#393847" strokeLinecap="round" strokeLinejoin="round" />
             </g>
         </g>
     </svg>
@@ -71,12 +71,12 @@ export const TextIcon = () => (
 )
 export const PlusIcon = () => (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path id="Vector" d="M7 13V7M7 7V1M7 7H13M7 7H1" stroke="#393847" stroke-linecap="round" />
+        <path id="Vector" d="M7 13V7M7 7V1M7 7H13M7 7H1" stroke="#393847" strokeLinecap="round" />
     </svg>
 )
 export const MiusIcon = () => (
     <svg width="14" height="2" viewBox="0 0 14 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path id="Vector" d="M13 1H7H1" stroke="#393847" stroke-linecap="round" />
+        <path id="Vector" d="M13 1H7H1" stroke="#393847" strokeLinecap="round" />
     </svg>
 )
 export const SaveIcon = () => (
@@ -85,9 +85,9 @@ export const SaveIcon = () => (
             <path id="Vector" d="M12 14L14.6666 11.3333L13.7333 10.4L12.6666 11.4666V8.68331H11.3333V11.4666L10.2666 10.4L9.33329 11.3333L12 14ZM9.33329 16V14.6666H14.6666V16H9.33329ZM2.66663 13.3333V1.33331H8.66663L12.6666 5.33331V7.34998H11.3333V5.99998H7.99996V2.66665H3.99996V12H7.99996V13.3333H2.66663Z" fill="white" />
         </g>
         <defs>
-            <clipPath id="clip0_1_613">
+            <clip-path id="clip0_1_613">
                 <rect width="16" height="16" fill="white" />
-            </clipPath>
+            </clip-path>
         </defs>
     </svg>
 )
@@ -109,9 +109,9 @@ export const EyeClose = () => (
 </g>
 </g>
 <defs>
-<clipPath id="clip0_157_1431">
+<clip-path id="clip0_157_1431">
 <rect width="16" height="16" fill="white"/>
-</clipPath>
+</clip-path>
 </defs>
 </svg>
 
@@ -127,7 +127,7 @@ export const Folder = () => (
 export const PrveIcon = () => (
     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="ion:arrow-up-outline">
-            <path id="Vector" d="M7.62506 13L3.12506 8.5L7.62506 4M3.75006 8.5L12.8751 8.5" stroke="#393847" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path id="Vector" d="M7.62506 13L3.12506 8.5L7.62506 4M3.75006 8.5L12.8751 8.5" stroke="#393847" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </g>
     </svg>
 )
@@ -136,7 +136,7 @@ export const NextIcon = () => (
 
     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="ion:arrow-up-outline">
-            <path id="Vector" d="M8.375 4L12.875 8.5L8.375 13M12.25 8.5L3.125 8.5" stroke="#393847" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path id="Vector" d="M8.375 4L12.875 8.5L8.375 13M12.25 8.5L3.125 8.5" stroke="#393847" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </g>
     </svg>
 
@@ -145,8 +145,8 @@ export const NextIcon = () => (
 export const LockIcon = () => (
     <svg width="10" height="12" viewBox="0 0 10 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="Group 427319745">
-            <rect id="Rectangle 34624848" x="0.4" y="3.9" width="9.2" height="7.2" rx="1.6" stroke="#393847" stroke-width="0.8" />
-            <path id="Rectangle 34624849" d="M8 4V3.5C8 1.84315 6.65685 0.5 5 0.5V0.5C3.34315 0.5 2 1.84315 2 3.5V4" stroke="#393847" stroke-width="0.8" />
+            <rect id="Rectangle 34624848" x="0.4" y="3.9" width="9.2" height="7.2" rx="1.6" stroke="#393847" strokeWidth="0.8" />
+            <path id="Rectangle 34624849" d="M8 4V3.5C8 1.84315 6.65685 0.5 5 0.5V0.5C3.34315 0.5 2 1.84315 2 3.5V4" stroke="#393847" strokeWidth="0.8" />
         </g>
     </svg>
 
@@ -157,7 +157,7 @@ export const LockOpen = () => (
 
     <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="Group 427319746">
-            <rect id="Rectangle 34624848" x="0.9" y="3.9" width="9.2" height="7.2" rx="1.6" stroke="#393847" stroke-width="0.8" />
+            <rect id="Rectangle 34624848" x="0.9" y="3.9" width="9.2" height="7.2" rx="1.6" stroke="#393847" strokeWidth="0.8" />
             <path id="Rectangle 34624849" d="M13.1 4C13.1 4.22091 13.2791 4.4 13.5 4.4C13.7209 4.4 13.9 4.22091 13.9 4H13.1ZM13.1 3.5V4H13.9V3.5H13.1ZM7.9 4V3.5H7.1V4H7.9ZM10.5 0.9C11.9359 0.9 13.1 2.06406 13.1 3.5H13.9C13.9 1.62223 12.3778 0.1 10.5 0.1V0.9ZM10.5 0.1C8.62223 0.1 7.1 1.62223 7.1 3.5H7.9C7.9 2.06406 9.06406 0.9 10.5 0.9V0.1Z" fill="#393847" />
         </g>
     </svg>
