@@ -19,7 +19,6 @@ function Workspace() {
 
   const selectLabelHandler = (flag, name) => {
     // 부품을 선택할 때 이전 데이터를 삭제하고 새로운 데이터로 교체
-    updateItemInLabelData(flag, name, selectedLabel);
     setSelectedLabel(prevState => labelData[flag].find(item => item.name === name));
   };
 
@@ -41,6 +40,7 @@ function Workspace() {
   }
 
   const toggleAllItemHandler = (flag, value) => {
+    console.log(value);
       setLabelData(prevData => {
           const updatedFlag = prevData[flag].map((item) => ({...item, isActive: value}));
 
@@ -54,40 +54,45 @@ function Workspace() {
   const handleAnnotationChange = (newAnnotations) => {
     // 주석 정보가 업데이트되면 Workspace 컴포넌트의 state를 업데이트
     setAnnotations(newAnnotations);
+    const annotation = {...newAnnotations};
     
-    newAnnotations.annotations.forEach((annotation) => {
-      const flag = 'part';
-      const labelName = annotation.selectedLabel;
-      
-      // 이전 데이터를 삭제하고 새로운 데이터로 교체
-      selectLabelHandler(flag, labelName);
-      toggleAllItemHandler(flag, true);
-      updateItemInLabelData(flag, labelName, annotation);
-    });
-  };
-  
-  // labelData 상태 업데이트를 위한 함수
-  const updateItemInLabelData = (flag, labelName, newItemData) => {
     setLabelData((prevData) => {
+      const flag = 'part';
       const updatedFlag = [...prevData[flag]];
-      const targetItemIndex = updatedFlag.findIndex((item) => item.name === labelName);
   
-      if (targetItemIndex !== -1) {
-        const updatedItems = [newItemData];
+      // 모든 라벨의 items를 빈 배열로 초기화한다.
+      const updatedFlagWithResetItems = updatedFlag.map((label) => ({
+        ...label,
+        items: [],
+      }));
   
-        updatedFlag[targetItemIndex] = {
-          ...updatedFlag[targetItemIndex],
-          items: updatedItems,
-        };
+      return {
+        ...prevData,
+        [flag]: updatedFlagWithResetItems,
+      };
+    });    
+
+    for(var i = 0; i < annotation.annotations.length; i++) {
+      const flag = 'part';
+      const labelName = newAnnotations.annotations[i].selectedLabel;
+      const newItemData = newAnnotations.annotations[i];
+
+      setLabelData((prevData) => {
+        const updatedFlag = [...prevData[flag]];
+
+        // labelName이 동일한 라벨을 찾아서 해당 라벨의 items에 newItemData를 추가한다.
+        const updatedFlagWithNewItem = updatedFlag.map((label) => ({
+          ...label,
+          items: label.name === labelName ? [...label.items, newItemData] : label.items,
+        }));
+        selectLabelHandler(flag, labelName);
   
         return {
           ...prevData,
-          [flag]: updatedFlag,
+          [flag]: updatedFlagWithNewItem,
         };
-      }
-  
-      return prevData;
-    });
+      });
+    }
   };
 
   const onSelectTool = (tool) => {

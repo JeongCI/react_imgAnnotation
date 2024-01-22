@@ -4,7 +4,7 @@ import { PrveIcon, NextIcon } from './Icons';
 import 'swiper/css';
 import { v4 as uuidv4 } from 'uuid';
 
-const Labelpice = ["선택", "부품1", "부품2", "부품3", "부품4", "부품5", "부품6", "부품7", "부품8", "부품9", "부품10", "부품11", "부품12", "부품13", "부품14", "부품15", "부품16", "부품17", "부품18", "부품19", "부품20", "부품21"];
+const Labelpice = ["부품1", "부품2", "부품3", "부품4", "부품5", "부품6", "부품7", "부품8", "부품9", "부품10", "부품11", "부품12", "부품13", "부품14", "부품15", "부품16", "부품17", "부품18", "부품19", "부품20", "부품21"];
 const labelPart = ["손상1", "손상2", "손상3", "손상4", "손상5"];
 
 
@@ -97,7 +97,6 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
     } else {
       // 새로운 다각형을 그리는 경우
       const object = {
-        flag: 'polygon',
         id: selectedObject,
         data: [], // 초기에는 빈 배열로 시작
         selectedLabel: selectedLabel,
@@ -150,7 +149,6 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       } else {
         // 새로운 다각형을 그리는 경우
         const object = {
-          flag: 'polygon',
           id: selectedObject,
           selectedLabel: selectedLabel,
           selectedLabelPart: selectedLabelPart,
@@ -750,6 +748,15 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
                           </option>
                         ))}
                       </select>
+                      <select
+                        value={bbox.selectedLabelPart}
+                        onChange={(e) => handleLabelPartChange(bbox.id, e.target.value)} >
+                          {labelPart.map((label, index) => (
+                            <option key={index} value={label}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>                      
                       </div>
                     </div>
                   </foreignObject>
@@ -884,11 +891,6 @@ function Workcanvas({ selectedTool,  onAnnotationChange }) {
       <h4>food_20230123.png</h4>
       <div className="canvas">
       <Showcase selectedTool={selectedTool} onAnnotationChange={handleAnnotationChange} />
-      </div>
-      {/* 주석 정보 확인용 */}
-      <div>
-        <h5>Annotation Data:</h5>
-        <pre>{JSON.stringify(annotations, null, 2)}</pre>
       </div>
     </div>
   );
