@@ -23,6 +23,12 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [bboxData, setBboxData] = useState([]);
   const [scale, setScale] = useState(1);
+  const [annotationsList, setAnnotationsList] = useState([]);
+
+  useEffect(() => {
+    // 삭제 작업 완료 후 주석 정보 업데이트
+    updateAnnotations();
+  }, [polygons, bboxData]);
 
   function handleLabelChange(id, newLabel) {
     setPolygons((prevPolygons) =>
@@ -55,65 +61,74 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
     if (selectedTool === 'polygon' && e.key === 'Enter') {
       // 엔터 키를 누르면 폴리곤 작업 완료
       const position = polygons.findIndex((object) => object.id === selectedObject);
+      const items = [...polygons];
+      const item = { ...items[position] };
       if(position === -1) {
         return;
+      } 
+
+      if (item.data.length < 3) {
+        items.splice(position, 1);
+        setPolygons(items);
+        setHistory((prevHistory) => [...prevHistory, items]);
+        setSelectedObject(null); // 새로운 다각형을 선택 상태로 변경하지 않음
       } else {
-        handlePolygonCreation();
         finishAnnotation();
+        setIsMouseDown(false);
+        handleAddAnnotation("polygon", polygons);
+        document.removeEventListener('keydown', handleKeyDown);
       }
     }
   };
   
-  const handlePolygonCreation = () => {
-    // 폴리곤 생성 로직
-    setIsMouseDown(false);
+  // const handlePolygonCreation = () => {
+  //   // 폴리곤 생성 로직
+  
+  //   // 현재 폴리곤의 ID 확인
+  //   const position = polygons.findIndex((object) => object.id === selectedObject);
+  
+  //   if (position !== -1) {
+  //     // 이미 그려진 다각형을 수정하는 경우
+  //     const items = [...polygons];
+  //     const item = { ...items[position] };
+  
+  //     // 기존 다각형이 적어도 3개의 점을 가지고 있어야 함 (폴리곤 조건)
+  //     if (item.data.length >= 3) {
+  //       // 폴리곤이 완성된 경우 새로운 ID 생성
+  //       const newObjectId = uuidv4();
+  
+  //       // 현재 다각형에 새로운 ID 할당
+  //       item.id = newObjectId;
+  
+  //       items[position] = item;
+  //       setPolygons(items);
+  //       setHistory((prevHistory) => [...prevHistory, items]);
+  //       setSelectedObject(null); // 새로운 다각형을 선택 상태로 변경하지 않음
+  //     } else {
+  //       // 폴리곤이 3개 미만의 점을 가지고 있는 경우 폴리곤 삭제
+  //       items.splice(position, 1);
+  //       setPolygons(items);
+  //       setHistory((prevHistory) => [...prevHistory, items]);
+  //       setSelectedObject(null); // 새로운 다각형을 선택 상태로 변경하지 않음
+  //     }
+  //   }
+  
+  //   // 업데이트 및 추가 로직
+  //   updateAnnotations(polygons);
     
-    // 현재 폴리곤의 ID 확인
-    const position = polygons.findIndex((object) => object.id === selectedObject);
-    
-    if (position !== -1) {
-      // 이미 그려진 다각형을 수정하는 경우
-      const items = [...polygons];
-      const item = { ...items[position] };
-      
-      // 기존 다각형이 적어도 3개의 점을 가지고 있어야 함 (폴리곤 조건)
-      if (item.data.length >= 3) {
-        // 폴리곤이 완성된 경우 새로운 ID 생성
-        const newObjectId = uuidv4();
-        
-        // 현재 다각형에 새로운 ID 할당
-        item.id = newObjectId;
-        
-        items[position] = item;
-        setPolygons(items);
-        setHistory((prevHistory) => [...prevHistory, items]);
-        setSelectedObject(newObjectId); // 새로운 다각형을 선택 상태로 변경
-      } else {
-        // 폴리곤이 3개 미만의 점을 가지고 있는 경우 폴리곤 삭제
-        items.splice(position, 1);
-        setPolygons(items);
-        setHistory((prevHistory) => [...prevHistory, items]);
-      }
-    } else {
-      // 새로운 다각형을 그리는 경우
-      const object = {
-        id: selectedObject,
-        data: [], // 초기에는 빈 배열로 시작
-        selectedLabel: selectedLabel,
-        selectedLabelPart: selectedLabelPart,
-      };
-      setPolygons((prevPolygons) => [...prevPolygons, object]);
-      setHistory((prevHistory) => [...prevHistory, polygons]);
-      setSelectedObject(object.id); // 생성된 다각형을 선택 상태로 변경  
-    }
-    // 이벤트 리스너 등록
-    document.addEventListener('keydown', handleKeyDown);
-    
-    updateAnnotations(polygons);
-    document.removeEventListener('keydown', handleKeyDown);
-  };  
+  
+  //   // 이벤트 리스너 등록/해제
+  // };
 
-
+  // undo 리스트
+  const handleAddAnnotation = (annotationType, data) => {
+    // 새로운 주석 추가 시 현재 상태를 복제하여 업데이트
+    setAnnotationsList((prevAnnotationsList) => [
+      { type: annotationType, data: data },
+      ...prevAnnotationsList,
+    ]);
+    console.log(annotationsList);
+  };
   
   function startDraw(e) {
     // selectedTool이 'polygon'인 경우에만 실행
@@ -122,14 +137,14 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       // 마우스 클릭 위치 계산
       const { x, y } = svgRef.current.getBoundingClientRect();
       const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
-    
+  
       const position = polygons.findIndex((object) => object.id === selectedObject);
-    
+  
       if (position !== -1) {
         // 이미 그려진 다각형을 수정하는 경우
         const items = [...polygons];
         const item = { ...items[position] };
-    
+  
         // 클릭한 위치가 기존 점 위에 있는지 확인
         const clickedPointIndex = item.data.findIndex((point) => {
           const distance = Math.sqrt(
@@ -137,19 +152,21 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
           );
           return distance < 5; // 일정 거리 이내의 점을 클릭으로 간주 (임계값 조절 가능)
         });
-    
+  
         if (clickedPointIndex === -1) {
           // 클릭한 위치가 기존 점 위에 없으면 새로운 점 추가
           item.data.push({ x: clickPositionX, y: clickPositionY });
         }
-    
+  
         items[position] = item;
         setPolygons(items);
         setHistory((prevHistory) => [...prevHistory, items]);
       } else {
         // 새로운 다각형을 그리는 경우
+        const objectId = uuidv4();
         const object = {
-          id: selectedObject,
+          figure: "polygon",
+          id: objectId,
           selectedLabel: selectedLabel,
           selectedLabelPart: selectedLabelPart,
           data: [
@@ -161,6 +178,7 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
         };
         setPolygons((prevPolygons) => [...prevPolygons, object]);
         setHistory((prevHistory) => [...prevHistory, polygons]);
+        setSelectedObject(objectId);
       }
     } else if (selectedTool === 'bbox' && e.button !== 1) {
       // 'bbox' 도구 선택 시 실행 (바운딩 박스 그리기 시작)
@@ -174,7 +192,7 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       setBboxData((prevBboxData) => [
         ...prevBboxData,
         {
-          flag: 'bbox',
+          figure: 'bbox',
           id: uuidv4(),
           x: clickPositionX,
           y: clickPositionY,
@@ -300,6 +318,9 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
     setIsMouseDown(false);
     setSelectedPoint(null);
     updateAnnotations(bboxData, polygons);
+    if(selectedTool === 'bbox') {
+      handleAddAnnotation("bbox", bboxData);
+    }
   }  
 
   function getCoordinates(e, offsetX = 0, offsetY = 0) {
@@ -308,7 +329,7 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
     const clickPositionY = clientY - offsetY;
     return { clickPositionX, clickPositionY };
   }
-
+ 
   function deleteAnnotation(id) {
     setPolygons((prevPolygons) => {
       const newPolygons = prevPolygons.filter((object) => object.id !== id);
@@ -319,8 +340,19 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       const newBboxData = prevBboxData.filter((bbox) => bbox.id !== id);
       return newBboxData;
     });
-
-    updateAnnotations(bboxData, polygons);
+    
+    console.log(annotationsList);
+    for(var i = 0; i < annotationsList.length; i++) {
+      console.log("id : " + id);
+      const dataValues = Object.values(annotationsList[i].data);
+      console.log(dataValues);
+      const index = dataValues.findIndex(item => item.id === id);
+      console.log(index);
+      
+      if(index !== -1) {
+        annotationsList.splice(i, 1);
+      }
+    }
   }
 
   const updateAnnotations = () => {
@@ -332,64 +364,63 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
     onAnnotationChange({
       annotations: [...currentPolygons, ...currentBboxData],
     });
-  };  
+  }; 
 
-  function newAnnotation() {
-    setIsDrawing(true);
+  // function newAnnotation() {
+  //   setIsDrawing(true);
 
-    const newObjectId = uuidv4();
-    setSelectedObject(newObjectId);
-    const newPolygon = {
-      id: newObjectId,
-      data: [],
-      selectedLabel: Labelpice[0],
-    };
-    setHistory((prevHistory) => [...prevHistory, polygons]);
-    setRedoHistory([]);
-    setPolygons((prevPolygons) => [...prevPolygons, newPolygon]);
-  }
+  //   const newObjectId = uuidv4();
+  //   setSelectedObject(newObjectId);
+  //   const newPolygon = {
+  //     id: newObjectId,
+  //     data: [],
+  //     selectedLabel: Labelpice[0],
+  //   };
+  //   setHistory((prevHistory) => [...prevHistory, polygons]);
+  //   setRedoHistory([]);
+  //   setPolygons((prevPolygons) => [...prevPolygons, newPolygon]);
+  // }
 
   // 이전으로
-  function undoAnnotation() {
+  window.undoAnnotation = () => {
+    console.log(annotationsList);
     // polygons와 bboxData 중 어떤 것이든 데이터가 없으면 바로 리턴
-    if (polygons.length === 0 && bboxData.length === 0) return;
+    if (annotationsList.length === 0) return;
+  
+    // annotationsList type
+    const type = annotationsList[0].type;
   
     // 어떤 데이터가 있다면 redoHistory에 현재 상태를 추가
     setRedoHistory((prevRedoHistory) => [...prevRedoHistory, { polygons, bboxData }]);
   
-    // 현재 선택된 도형이 폴리곤인지 bbox인지 확인
-    const isPolygonSelected = selectedTool;
-  
-    if (isPolygonSelected === "polygon") {
-      setRedoHistory((prevRedoHistory) => [...prevRedoHistory, polygons]);
-  
+    if (type === "polygon") {
       setPolygons((prevPolygons) => {
         const updatedPolygons = [...prevPolygons];
         if (updatedPolygons.length > 0) {
           const lastPolygon = updatedPolygons[updatedPolygons.length - 1];
-          if (lastPolygon.data.length > 0) {
+          console.log(lastPolygon);
+          if (lastPolygon.data.length > 2) {
             lastPolygon.data.pop();
           } else {
             updatedPolygons.pop();
+            annotationsList.shift();
           }
         }
-  
         return updatedPolygons;
       });
-    } else if (isPolygonSelected === "bbox") {
-      setRedoHistory((prevRedoHistory) => [...prevRedoHistory, bboxData]);
-      // bbox 선택 시
+      updateAnnotations(bboxData, polygons);
+    } else if (type === "bbox") {
       setBboxData((prevBboxData) => {
         const updatedBboxData = [...prevBboxData];
         if (updatedBboxData.length > 0) {
           updatedBboxData.pop();
         }
-  
+        annotationsList.shift();
         return updatedBboxData;
       });
+      updateAnnotations(bboxData, polygons);
     }
-    updateAnnotations(bboxData, polygons);
-  }
+  };
 
   // 원상태로
   function redoAnnotation() {
@@ -765,12 +796,12 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
             </g>
             </svg>
           </div>
-          {selectedObject != null ? (
+          {/* {selectedObject != null ? (
             <button onClick={finishAnnotation}>Finish Annotation</button>
           ) : (
             <button onClick={newAnnotation}>New Annotation</button>
-          )}
-          <button onClick={undoAnnotation}>Undo</button>
+          )} */}
+          {/* <button onClick={undoAnnotation}>Undo</button> */}
           {/* <button onClick={redoAnnotation}>Redo</button> */}
           <div className="panel">         
           </div>
@@ -891,6 +922,11 @@ function Workcanvas({ selectedTool,  onAnnotationChange }) {
       <h4>food_20230123.png</h4>
       <div className="canvas">
       <Showcase selectedTool={selectedTool} onAnnotationChange={handleAnnotationChange} />
+      </div>
+      {/* 주석 정보 확인용 */}
+      <div>
+        <h5>Annotation Data:</h5>
+        <pre>{JSON.stringify(annotations, null, 2)}</pre>
       </div>
     </div>
   );

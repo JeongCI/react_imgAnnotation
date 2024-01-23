@@ -96,23 +96,25 @@ function Workspace() {
   };
 
   const onSelectTool = (tool) => {
-      console.log("Selected tool:", tool);
-      setSelectedTool(tool);
+    console.log("Selected tool:", tool);
+    setSelectedTool(tool);
 
-      if (tool === "polygon" && workCanvasRef.current) {
-          workCanvasRef.current.startDraw();
-      } else if (tool === "bbox" && workCanvasRef.current) {
-          workCanvasRef.current.startDraw();
-      } else if (tool === "plus" && workCanvasRef.current) {
-          workCanvasRef.current.handleWheel();
-      } else if (tool === "minus" && workCanvasRef.current) {
-          workCanvasRef.current.handleWheel();
-      }
+    if (tool === "polygon" && workCanvasRef.current) {
+      workCanvasRef.current.startDraw();
+    } else if (tool === "bbox" && workCanvasRef.current) {
+      workCanvasRef.current.startDraw();
+    } else if (tool === "plus" && workCanvasRef.current) {
+      workCanvasRef.current.handleWheel();
+    } else if (tool === "minus" && workCanvasRef.current) {
+      workCanvasRef.current.handleWheel();
+    } else if (tool ==='undo') {
+      window.undoAnnotation();
+    }
   };
 
   return (
       <div className="Workspace">
-          <Topinfo/>
+          <Topinfo dataFromParent={annotations}/>
           <Toolbar onSelectTool={onSelectTool}/>
           <Workcanvas ref={workCanvasRef}
                       selectedTool={selectedTool}

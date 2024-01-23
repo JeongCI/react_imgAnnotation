@@ -21,7 +21,8 @@ const SelectBox = (props) => {
         </select>
     );
 };
-function Topinfo() {
+
+function Topinfo({ dataFromParent }) {
     const [lastModifiedTime, setLastModifiedTime] = useState("");
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -39,6 +40,33 @@ function Topinfo() {
 
         return () => clearInterval(intervalId);
     }, []);
+
+    const downloadJson = () => {
+        const currentTime = new Date();
+        const formattedTime = currentTime.toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour12: false,  // 24-hour format
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    
+        const formattedFileName = formattedTime.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
+    
+        const jsonContent = JSON.stringify(dataFromParent, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${formattedFileName}_annotations.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
 
         <div className="Topinfo">
@@ -48,9 +76,9 @@ function Topinfo() {
             <div className="Dateinfo">
                 <span>최근수정한 시간:</span>
                 <span className="time">{lastModifiedTime}</span>
-                <button className="Save">
-
-                 <SaveIcon />Save</button>
+                <button className="Save" onClick={downloadJson}>
+                    <SaveIcon /> Save
+                </button>
             </div>
         </div>
     );
