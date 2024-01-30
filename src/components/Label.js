@@ -17,14 +17,61 @@ function Label({labelData, onSelectLabel, onToggleActive, onToggleAllItem}) {
     };
 
     const toggleEyeIcon = (flag, item) => {
-        onToggleActive(flag, item)
+        onToggleActive(flag, item);
+        item.items.forEach(subItem => {
+            toggleVisibilityByKey(subItem.id, item.isActive);
+        });
+    };
+
+    const toggleVisibilityByKey = (key, isActive) => {
+        const gElement = document.querySelector(`g[data-key="${key}"]`); // key값이 일치하는 g 태그를 선택
+      
+        if (gElement) {
+          const childElements = gElement.querySelectorAll('*'); // g 태그의 모든 하위 요소를 선택
+      
+          childElements.forEach((childElement) => {
+            // isActive 값에 따라 visibility 속성을 설정하여 보이거나 숨김
+            childElement.style.visibility = !isActive ? 'visible' : 'hidden';
+          });
+        }
     };
 
     const toggleEyeIcons = (flag) => {
-        if (isAllActive(flag))
-            onToggleAllItem(flag, false)
-        else
-            onToggleAllItem(flag, true)
+        if (isAllActive(flag)) {
+            onToggleAllItem(flag, false);
+            
+            // 모든 하위 요소를 숨김
+            if(flag === 'part') {
+                labelData.part.forEach(partItem => {
+                    partItem.items.forEach(subItem => {
+                        toggleVisibilityByKey(subItem.id, true);
+                    });
+                });
+            } else {
+                labelData.damage.forEach(partItem => {
+                    partItem.items.forEach(subItem => {
+                        toggleVisibilityByKey(subItem.id, true);
+                    });
+                });
+            }
+        } else {
+            onToggleAllItem(flag, true);
+    
+            // 모든 하위 요소를 보이도록 함
+            if(flag === 'part') {
+                labelData.part.forEach(partItem => {
+                    partItem.items.forEach(subItem => {
+                        toggleVisibilityByKey(subItem.id, false);
+                    });
+                });
+            } else {
+                labelData.damage.forEach(partItem => {
+                    partItem.items.forEach(subItem => {
+                        toggleVisibilityByKey(subItem.id, false);
+                    });
+                });                
+            }
+        }
     }
 
     const isAllActive = (flag) => {
@@ -46,6 +93,15 @@ function Label({labelData, onSelectLabel, onToggleActive, onToggleAllItem}) {
         toggleLock(index, isDamage);
     };
 
+    // labelData.items 개수 구하기
+    const totalLength = () => {
+        let total = 0;
+        for(let i = 0; i < labelData.part.length; i++) {
+            total += labelData.part[i].items.length;
+        }
+        return total;
+    };
+
     return (
         <div className="Label">
             <h4 className={isPartSubMenuOpen ? "ActiveLabel" : ""}>Label</h4>
@@ -58,7 +114,7 @@ function Label({labelData, onSelectLabel, onToggleActive, onToggleAllItem}) {
                                 {!isAllActive("part") ? <EyeClose/> : <EyeIcon/>}
                             </span>
                             <span className="Foldericon"><Folder/></span>
-                            {labelData.part && labelData.part.length && <p>부품({labelData.part.length})</p>}
+                            {labelData.part && labelData.part.length && <p>부품({ totalLength() })</p>}
                         </div>
                         <div>
                             <span className="Arrowicon" onClick={toggleSubMenu}>

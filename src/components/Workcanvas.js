@@ -127,7 +127,6 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       { type: annotationType, data: data },
       ...prevAnnotationsList,
     ]);
-    console.log(annotationsList);
   };
   
   function startDraw(e) {
@@ -280,25 +279,13 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
         // 바운딩 박스의 너비와 높이를 계산
         const width = newPoint.x - currentBbox.points[0].x;
         const height = newPoint.y - currentBbox.points[0].y;
-      
-        // 바운딩 박스의 너비와 높이를 업데이트
-        currentBbox.width = width;
-        currentBbox.height = height;
-      
+
+        // 바운딩 박스의 너비와 높이를 업데이트 (음수 값을 방지하기 위해 Math.max 사용)
+        currentBbox.width = Math.max(0, width);
+        currentBbox.height = Math.max(0, height);
+
         return updatedBboxData;
       });
-    } else if (isMouseDown && selectedTool === 'polygon') {
-      if (selectedPoint !== null) {
-        // If a point is selected, update its position
-        const { x, y } = svgRef.current.getBoundingClientRect();
-        const { clickPositionX, clickPositionY } = getCoordinates(e, x, y);
-    
-        const items = [...polygons];
-        const item = { ...items[selectedPoint.polygonIndex] };
-        item.data[selectedPoint.pointIndex] = { x: clickPositionX, y: clickPositionY };
-        items[selectedPoint.polygonIndex] = item;
-        setPolygons(items);
-      }
     } else if (isMouseDown && selectedTool === 'handle') { // polygon 점 이동
       if (selectedPoint !== null) {
         // If a point is selected, update its position
@@ -341,13 +328,9 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       return newBboxData;
     });
     
-    console.log(annotationsList);
     for(var i = 0; i < annotationsList.length; i++) {
-      console.log("id : " + id);
       const dataValues = Object.values(annotationsList[i].data);
-      console.log(dataValues);
       const index = dataValues.findIndex(item => item.id === id);
-      console.log(index);
       
       if(index !== -1) {
         annotationsList.splice(i, 1);
@@ -383,7 +366,6 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
 
   // 이전으로
   window.undoAnnotation = () => {
-    console.log(annotationsList);
     // polygons와 bboxData 중 어떤 것이든 데이터가 없으면 바로 리턴
     if (annotationsList.length === 0) return;
   
@@ -398,7 +380,6 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
         const updatedPolygons = [...prevPolygons];
         if (updatedPolygons.length > 0) {
           const lastPolygon = updatedPolygons[updatedPolygons.length - 1];
-          console.log(lastPolygon);
           if (lastPolygon.data.length > 2) {
             lastPolygon.data.pop();
           } else {
@@ -699,22 +680,20 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
               )}
               <g>
                 {polygons.map((item) => (
-                  <g key={item.id}>
-                    {item.data.map((coordinate, index) => (
-                      <circle key={index} cx={coordinate.x} cy={coordinate.y} r="5" fill="blue" />
-                    ))}
+                  <g data-key={item.id} key={item.id}>
                     <polygon
                       points={getPositionString(item)}
-                      className="polygon"
+                      cursor= 'move'
                       onMouseDown={(e) => handlePolygonMouseDown(item.id, e)}
-                      fill="rgba(0, 0, 255, 0.2)" // Add fill color
-                      stroke="blue" // Add stroke color
-                      strokeWidth="2" // Add stroke width
-                    />
+                      className={`label-item-${Labelpice.indexOf(item.selectedLabel)}`}
+                      />
+                      {item.data.map((coordinate, index) => (
+                        <circle key={index} cx={coordinate.x} cy={coordinate.y} r="5" cursor='grab'  className={`point-item-${Labelpice.indexOf(item.selectedLabel)}`} />
+                      ))}
                     {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
-                    <foreignObject x={item.data[0].x} y={item.data[0].y - 100} width="100" height="80">
+                    <foreignObject x={item.data[0].x} y={item.data[0].y - 70} width="140" height="100">
                       <div className="underBox" key={item.id}>
-                        <span>POLYGON</span>
+                        <span className="boxText">POLYGON</span>
                         <button onClick={() => deleteAnnotation(item.id)}>Delete</button>
                         <div className="underData">
                         <select
@@ -743,31 +722,30 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
               </g>
               <g>
               {bboxData.map((bbox) => (
-                <g key={bbox.id}>
-                  {/* 좌상단 꼭지점 */}
-                  <circle cx={bbox.x} cy={bbox.y} r="5" fill="red" />
-                  {/* 우상단 꼭지점 */}
-                  <circle cx={bbox.x + bbox.width} cy={bbox.y} r="5" fill="red" />
-                  {/* 좌하단 꼭지점 */}
-                  <circle cx={bbox.x} cy={bbox.y + bbox.height} r="5" fill="red" />
-                  {/* 우하단 꼭지점 */}
-                  <circle cx={bbox.x + bbox.width} cy={bbox.y + bbox.height} r="5" fill="red" />
-
+                <g data-key={bbox.id} key={bbox.id}>
                   {/* 바운딩 박스 */}
                   <rect
                     x={bbox.x}
                     y={bbox.y}
                     width={bbox.width}
                     height={bbox.height}
-                    fill="rgba(255, 0, 255, 0.2)"
-                    stroke="pink"
-                    strokeWidth="2"
+                    cursor= 'move'
+                    className={`label-item-${Labelpice.indexOf(bbox.selectedLabel)}`}
                     onMouseDown={(e) => handleBboxMouseDown(bbox.id, e)}
                   />
+                  {/* 좌상단 꼭지점 */}
+                  <circle cx={bbox.x} cy={bbox.y} r="5" className={`point-item-${Labelpice.indexOf(bbox.selectedLabel)}`} />
+                  {/* 우상단 꼭지점 */}
+                  <circle cx={bbox.x + bbox.width} cy={bbox.y} r="5" className={`point-item-${Labelpice.indexOf(bbox.selectedLabel)}`} />
+                  {/* 좌하단 꼭지점 */}
+                  <circle cx={bbox.x} cy={bbox.y + bbox.height} r="5" className={`point-item-${Labelpice.indexOf(bbox.selectedLabel)}`} />
+                  {/* 우하단 꼭지점 */}
+                  <circle cx={bbox.x + bbox.width} cy={bbox.y + bbox.height} r="5" className={`point-item-${Labelpice.indexOf(bbox.selectedLabel)}`} />
+
                   {/* foreignObject를 사용하여 HTML을 SVG에 삽입 */}
-                  <foreignObject x={bbox.x} y={bbox.y - 80} width="100" height="80">
+                  <foreignObject x={bbox.x} y={bbox.y - 70} width="140" height="100">
                     <div className="underBox" key={bbox.id} >
-                      <span>BBOX</span>
+                      <span className="boxText">BBOX</span>
                       <button onClick={() => deleteAnnotation(bbox.id)}>Delete</button>
                       <div className="underData">
                       <select
@@ -823,10 +801,6 @@ const Showcase = ({ selectedTool, onAnnotationChange }) => {
       </div>
       <style jsx>
         {`
-rect {
-cursor: crosshair;
-}
-
 img {
 display: block;
 }
@@ -837,8 +811,11 @@ flex-wrap: wrap;
 }
 
 .box {
+-webkit-user-select: none;
+-moz-user-select: none;
+user-select: none;
 position: relative;
-width: 100%;
+width: 1094px;
 height: 750px;
 margin-bottom: 16px;
 overflow:auto;
@@ -851,13 +828,6 @@ width: 100%;
 height: 100%;
 top: 0;
 left: 0;
-}
-
-.polygon {
-fill: rgba(255, 0, 0, 0.1);
-stroke: red;
-cursor: crosshair;
-stroke-width: 1;
 }
 
 .panel {
@@ -922,11 +892,6 @@ function Workcanvas({ selectedTool,  onAnnotationChange }) {
       <h4>food_20230123.png</h4>
       <div className="canvas">
       <Showcase selectedTool={selectedTool} onAnnotationChange={handleAnnotationChange} />
-      </div>
-      {/* 주석 정보 확인용 */}
-      <div>
-        <h5>Annotation Data:</h5>
-        <pre>{JSON.stringify(annotations, null, 2)}</pre>
       </div>
     </div>
   );

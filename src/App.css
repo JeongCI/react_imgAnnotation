@@ -1,8 +1,21 @@
 @import url(./assets/fonts/font.css);
 
 .underBox{
-  background-color: #fff;
-  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+.underData{
+  display:flex;
+}
+.boxText{
+  font-size: 14px;
+  font-weight: bold;
 }
 *{
 box-sizing: border-box;
@@ -271,7 +284,7 @@ left: 0;
 cursor: pointer;
 }
 .Label  ul.Submenu li:hover{
-background-color: rgba(244, 236, 254, 0.50);
+background-color: rgba(244, 236, 254, 0.20);
 }
 .Label  ul.Submenu .Hovericon{
 display: none;
@@ -295,7 +308,257 @@ margin-right: 4px;
 .Label  ul.Submenu .Hovericon.Active{
   display: inline-block;
   position: relative;
-  }
-  .swiper-no-swiping {
-    pointer-events: none;
-  }
+}
+.swiper-no-swiping {
+  pointer-events: none;
+}
+
+.label-item-0 {
+  fill: rgba(255, 0, 255, 0.2);
+  stroke: rgba(255, 192, 203);
+  stroke-width: 2;
+}
+.label-item-1 {
+  fill: rgb(255, 160, 0, 0.2); 
+  stroke-width: 2;
+  stroke: rgb(100, 150, 200);
+}
+
+.label-item-2 {
+  fill: rgb(255, 130, 0, 0.2); 
+  stroke-width: 2;
+  stroke: rgb(120, 180, 220);
+}
+
+.label-item-3 {
+  fill: rgb(255, 153, 102, 0.2);
+  stroke-width: 2;
+  stroke: rgb(184, 20, 86);
+}
+
+.label-item-4 {
+  fill: rgb(255, 153, 153, 0.2);
+  stroke-width: 2;
+  stroke: rgb(160, 240, 200);
+}
+
+.label-item-5 {
+  fill: rgb(255, 204, 153, 0.2);
+  stroke-width: 2;
+  stroke: rgb(180, 200, 160);
+}
+
+.label-item-6 {
+  fill: rgb(255, 255, 153, 0.2);
+  stroke-width: 2;
+  stroke: rgb(200, 160, 120);
+}
+
+.label-item-7 {
+  fill: rgb(255, 204, 204, 0.2);
+  stroke-width: 2;
+  stroke: rgb(220, 120, 80);
+}
+
+.label-item-8 {
+  fill: rgb(255, 204, 204, 0.2);
+  stroke-width: 2;
+  stroke: rgb(240, 80, 40);
+}
+
+.label-item-9 {
+  fill: rgb(255, 204, 204, 0.2);
+  stroke-width: 2;
+  stroke: rgb(255, 40, 0);
+}
+
+.label-item-10 {
+  fill: rgb(255, 153, 255, 0.2);
+  stroke-width: 2;
+  stroke: rgb(200, 0, 255);
+}
+
+.label-item-11 {
+  fill: rgb(255, 153, 255, 0.2);
+  stroke-width: 2;
+  stroke: rgb(160, 0, 200);
+}
+
+.label-item-12 {
+  fill: rgb(255, 153, 255, 0.2);
+  stroke-width: 2;
+  stroke: rgb(120, 0, 160);
+}
+
+.label-item-13 {
+  fill: rgb(255, 204, 204, 0.2);
+  stroke-width: 2;
+  stroke: rgb(80, 0, 120);
+}
+
+.label-item-14 {
+  fill: rgb(255, 255, 204, 0.2);
+  stroke-width: 2;
+  stroke: rgb(40, 0, 80);
+}
+
+.label-item-15 {
+  fill: rgb(255, 204, 204, 0.2);
+  stroke-width: 2;
+  stroke: rgb(255, 102, 102);
+}
+
+.label-item-16 {
+  fill: rgb(255, 218, 185, 0.2);
+  stroke-width: 2;
+  stroke: rgb(255, 69, 0);
+}
+
+.label-item-17 {
+  fill: rgb(255, 247, 231, 0.2);
+  stroke-width: 2;
+  stroke: rgb(255, 145, 164);
+}
+
+.label-item-18 {
+  fill: rgb(213, 255, 230, 0.2);
+  stroke-width: 2;
+  stroke: rgb(34, 139, 34);
+}
+
+.label-item-19 {
+  fill: rgb(224, 255, 255, 0.2);
+  stroke-width: 2;
+  stroke: rgb(73, 119, 205);
+}
+
+.label-item-20 {
+  fill: rgb(245, 245, 255, 0.2);
+  stroke-width: 2;
+  stroke: rgb(173, 216, 230);
+}
+
+.point-item-0 {
+  fill: red;
+  stroke: yellow;
+  stroke-width: 2;
+}
+.point-item-1 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-2 {
+  fill: red; 
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-3 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-4 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-5 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-6 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-7 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-8 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-9 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-10 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-11 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-12 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-13 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-14 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-15 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-16 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-17 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-18 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-19 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
+
+.point-item-20 {
+  fill: red;
+  stroke-width: 2;
+  stroke: yellow;
+}
